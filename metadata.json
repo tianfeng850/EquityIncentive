@@ -1,0 +1,6 @@
+{
+  "name": "股权激励管理系统",
+  "description": "企业级股权激励全流程管理平台，支持公司估值与股份配置、员工与部门管理、授予计划与分期成熟、报表合并导出与系统连接自检诊断。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

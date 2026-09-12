@@ -1,0 +1,507 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "created_at": "2026-09-12T03:48:45.242Z",
+    "last_updated": "2026-09-12T03:49:00.074Z"
+  },
+  "company_shares": [
+    {
+      "id": "share_2026_1789184936629",
+      "year": 2026,
+      "valuation": 190000000,
+      "total_shares": 10000000,
+      "pool_shares": 2000000,
+      "pool_percentage": 20,
+      "reserved_shares": 0,
+      "share_price": 19,
+      "currency": "CNY",
+      "status": "active",
+      "notes": "",
+      "created_at": "2026-09-12T03:48:56.629Z",
+      "updated_at": "2026-09-12T03:49:00.074Z"
+    },
+    {
+      "id": "share_2025",
+      "year": 2025,
+      "valuation": 120000000,
+      "total_shares": 10000000,
+      "pool_shares": 1500000,
+      "pool_percentage": 15,
+      "reserved_shares": 500000,
+      "share_price": 12,
+      "currency": "CNY",
+      "status": "active",
+      "notes": "2025年度最新B轮投后估值基准，激励池总规模为15%",
+      "created_at": "2026-07-14T03:48:45.243Z",
+      "updated_at": "2026-09-07T03:48:45.243Z"
+    },
+    {
+      "id": "share_2024",
+      "year": 2024,
+      "valuation": 80000000,
+      "total_shares": 10000000,
+      "pool_shares": 1200000,
+      "pool_percentage": 12,
+      "reserved_shares": 400000,
+      "share_price": 8,
+      "currency": "CNY",
+      "status": "archived",
+      "notes": "2024年度A轮估值基准归档版本",
+      "created_at": "2025-08-08T03:48:45.243Z",
+      "updated_at": "2025-09-12T03:48:45.243Z"
+    }
+  ],
+  "share_change_logs": [
+    {
+      "id": "log_1789184940074_twi93x",
+      "share_id": "share_2026_1789184936629",
+      "year": 2026,
+      "change_type": "update",
+      "details": "覆盖修改 2026 年度股份信息：估值 190000000 元，激励池 2000000 股 (20%)",
+      "old_values": {
+        "id": "share_2026_1789184936629",
+        "year": 2026,
+        "valuation": 180000000,
+        "total_shares": 10000000,
+        "pool_shares": 2000000,
+        "pool_percentage": 20,
+        "reserved_shares": 0,
+        "share_price": 18,
+        "currency": "CNY",
+        "status": "active",
+        "notes": "2026年C轮预期估值",
+        "created_at": "2026-09-12T03:48:56.629Z",
+        "updated_at": "2026-09-12T03:48:56.629Z"
+      },
+      "new_values": {
+        "id": "share_2026_1789184936629",
+        "year": 2026,
+        "valuation": 190000000,
+        "total_shares": 10000000,
+        "pool_shares": 2000000,
+        "pool_percentage": 20,
+        "reserved_shares": 0,
+        "share_price": 19,
+        "currency": "CNY",
+        "status": "active",
+        "notes": "",
+        "created_at": "2026-09-12T03:48:56.629Z",
+        "updated_at": "2026-09-12T03:49:00.074Z"
+      },
+      "operator": "管理员",
+      "created_at": "2026-09-12T03:49:00.074Z"
+    },
+    {
+      "id": "log_1789184936629_gfg8vs",
+      "share_id": "share_2026_1789184936629",
+      "year": 2026,
+      "change_type": "create",
+      "details": "新增 2026 年度股份基准配置：估值 180000000 元，激励池 2000000 股 (20%)，每股 18 元",
+      "new_values": {
+        "id": "share_2026_1789184936629",
+        "year": 2026,
+        "valuation": 180000000,
+        "total_shares": 10000000,
+        "pool_shares": 2000000,
+        "pool_percentage": 20,
+        "reserved_shares": 0,
+        "share_price": 18,
+        "currency": "CNY",
+        "status": "active",
+        "notes": "2026年C轮预期估值",
+        "created_at": "2026-09-12T03:48:56.629Z",
+        "updated_at": "2026-09-12T03:48:56.629Z"
+      },
+      "operator": "管理员",
+      "created_at": "2026-09-12T03:48:56.629Z"
+    },
+    {
+      "id": "log_share_1",
+      "share_id": "share_2025",
+      "year": 2025,
+      "change_type": "create",
+      "details": "初始化2025年度公司估值与激励池设定（1.2亿元，15%激励池）",
+      "operator": "管理员 (admin)",
+      "created_at": "2026-07-14T03:48:45.243Z"
+    }
+  ],
+  "departments": [
+    {
+      "id": "dept_1",
+      "name": "核心研发中心",
+      "code": "RND",
+      "manager_name": "张华 (CTO)",
+      "description": "负责核心架构设计、云原生平台与核心业务算法研发",
+      "created_at": "2026-06-04T03:48:45.243Z"
+    },
+    {
+      "id": "dept_2",
+      "name": "产品与交互设计部",
+      "code": "PRD",
+      "manager_name": "李晨 (CPO)",
+      "description": "负责产品全生命周期规划、需求管理与交互体验设计",
+      "created_at": "2026-06-04T03:48:45.243Z"
+    },
+    {
+      "id": "dept_3",
+      "name": "商业化与市场营销部",
+      "code": "MKT",
+      "manager_name": "王雪",
+      "description": "品牌出海、大客户商务拓展与全球渠道增长",
+      "created_at": "2026-06-14T03:48:45.243Z"
+    },
+    {
+      "id": "dept_4",
+      "name": "财务与风控管理部",
+      "code": "FIN",
+      "manager_name": "陈敏 (CFO)",
+      "description": "公司财务核算、期权合规审计与资本运作管理",
+      "created_at": "2026-06-14T03:48:45.243Z"
+    }
+  ],
+  "employees": [
+    {
+      "id": "emp_1",
+      "employee_no": "EMP-001",
+      "name": "张华",
+      "department_id": "dept_1",
+      "department_name": "核心研发中心",
+      "position": "技术副总裁 / CTO",
+      "email": "zhanghua@company.com",
+      "phone": "13800138001",
+      "hire_date": "2022-03-15",
+      "status": "active",
+      "created_at": "2026-06-14T03:48:45.243Z"
+    },
+    {
+      "id": "emp_2",
+      "employee_no": "EMP-002",
+      "name": "李晨",
+      "department_id": "dept_2",
+      "department_name": "产品与交互设计部",
+      "position": "产品副总裁 / CPO",
+      "email": "lichen@company.com",
+      "phone": "13800138002",
+      "hire_date": "2022-05-10",
+      "status": "active",
+      "created_at": "2026-06-14T03:48:45.243Z"
+    },
+    {
+      "id": "emp_3",
+      "employee_no": "EMP-003",
+      "name": "赵宇",
+      "department_id": "dept_1",
+      "department_name": "核心研发中心",
+      "position": "资深首席架构师",
+      "email": "zhaoyu@company.com",
+      "phone": "13800138003",
+      "hire_date": "2023-02-01",
+      "status": "active",
+      "created_at": "2026-06-24T03:48:45.243Z"
+    },
+    {
+      "id": "emp_4",
+      "employee_no": "EMP-004",
+      "name": "王雪",
+      "department_id": "dept_3",
+      "department_name": "商业化与市场营销部",
+      "position": "市场营销总监",
+      "email": "wangxue@company.com",
+      "phone": "13800138004",
+      "hire_date": "2023-04-18",
+      "status": "active",
+      "created_at": "2026-06-24T03:48:45.243Z"
+    },
+    {
+      "id": "emp_5",
+      "employee_no": "EMP-005",
+      "name": "孙浩",
+      "department_id": "dept_1",
+      "department_name": "核心研发中心",
+      "position": "前端专家工程师",
+      "email": "sunhao@company.com",
+      "phone": "13800138005",
+      "hire_date": "2023-08-01",
+      "status": "active",
+      "created_at": "2026-07-04T03:48:45.243Z"
+    }
+  ],
+  "grant_plans": [
+    {
+      "id": "plan_1",
+      "plan_no": "OPT-2024-001",
+      "employee_id": "emp_1",
+      "employee_name": "张华",
+      "employee_no": "EMP-001",
+      "department_id": "dept_1",
+      "department_name": "核心研发中心",
+      "share_year": 2024,
+      "grant_mode": "shares",
+      "total_shares": 300000,
+      "grant_price": 2,
+      "total_value": 600000,
+      "grant_date": "2024-01-01",
+      "lockup_months": 12,
+      "status": "active",
+      "notes": "创始骨干技术激励，分4年匀速成熟(每年25%)",
+      "created_at": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "plan_2",
+      "plan_no": "OPT-2024-002",
+      "employee_id": "emp_2",
+      "employee_name": "李晨",
+      "employee_no": "EMP-002",
+      "department_id": "dept_2",
+      "department_name": "产品与交互设计部",
+      "share_year": 2024,
+      "grant_mode": "shares",
+      "total_shares": 200000,
+      "grant_price": 2,
+      "total_value": 400000,
+      "grant_date": "2024-03-01",
+      "lockup_months": 12,
+      "status": "active",
+      "notes": "核心产品骨干期权计划，分4期成熟",
+      "created_at": "2024-03-01T00:00:00.000Z"
+    },
+    {
+      "id": "plan_3",
+      "plan_no": "OPT-2025-001",
+      "employee_id": "emp_3",
+      "employee_name": "赵宇",
+      "employee_no": "EMP-003",
+      "department_id": "dept_1",
+      "department_name": "核心研发中心",
+      "share_year": 2025,
+      "grant_mode": "shares",
+      "total_shares": 100000,
+      "grant_price": 3.5,
+      "total_value": 350000,
+      "grant_date": "2025-01-15",
+      "lockup_months": 12,
+      "status": "active",
+      "notes": "高潜架构师期权引入激励计划",
+      "created_at": "2025-01-15T00:00:00.000Z"
+    }
+  ],
+  "grant_cycles": [
+    {
+      "id": "cycle_1_1",
+      "plan_id": "plan_1",
+      "cycle_no": 1,
+      "vest_date": "2025-01-01",
+      "vest_percentage": 25,
+      "vest_shares": 75000,
+      "status": "vested",
+      "vest_conditions": "入职满1年且年度绩效达标",
+      "vested_at": "2025-01-01T08:00:00.000Z"
+    },
+    {
+      "id": "cycle_1_2",
+      "plan_id": "plan_1",
+      "cycle_no": 2,
+      "vest_date": "2026-01-01",
+      "vest_percentage": 25,
+      "vest_shares": 75000,
+      "status": "vested",
+      "vest_conditions": "在职且年度技术KPI通过",
+      "vested_at": "2026-01-01T08:00:00.000Z"
+    },
+    {
+      "id": "cycle_1_3",
+      "plan_id": "plan_1",
+      "cycle_no": 3,
+      "vest_date": "2027-01-01",
+      "vest_percentage": 25,
+      "vest_shares": 75000,
+      "status": "pending",
+      "vest_conditions": "在职且持续服务满3年"
+    },
+    {
+      "id": "cycle_1_4",
+      "plan_id": "plan_1",
+      "cycle_no": 4,
+      "vest_date": "2028-01-01",
+      "vest_percentage": 25,
+      "vest_shares": 75000,
+      "status": "pending",
+      "vest_conditions": "在职且服务满4年"
+    },
+    {
+      "id": "cycle_2_1",
+      "plan_id": "plan_2",
+      "cycle_no": 1,
+      "vest_date": "2025-03-01",
+      "vest_percentage": 25,
+      "vest_shares": 50000,
+      "status": "vested",
+      "vest_conditions": "服务满1年及产品里程碑达成",
+      "vested_at": "2025-03-01T08:00:00.000Z"
+    },
+    {
+      "id": "cycle_2_2",
+      "plan_id": "plan_2",
+      "cycle_no": 2,
+      "vest_date": "2026-03-01",
+      "vest_percentage": 25,
+      "vest_shares": 50000,
+      "status": "vested",
+      "vest_conditions": "服务满2年及产品质量指标达标",
+      "vested_at": "2026-03-01T08:00:00.000Z"
+    },
+    {
+      "id": "cycle_2_3",
+      "plan_id": "plan_2",
+      "cycle_no": 3,
+      "vest_date": "2027-03-01",
+      "vest_percentage": 25,
+      "vest_shares": 50000,
+      "status": "pending",
+      "vest_conditions": "服务满3年"
+    },
+    {
+      "id": "cycle_2_4",
+      "plan_id": "plan_2",
+      "cycle_no": 4,
+      "vest_date": "2028-03-01",
+      "vest_percentage": 25,
+      "vest_shares": 50000,
+      "status": "pending",
+      "vest_conditions": "服务满4年"
+    },
+    {
+      "id": "cycle_3_1",
+      "plan_id": "plan_3",
+      "cycle_no": 1,
+      "vest_date": "2026-01-15",
+      "vest_percentage": 25,
+      "vest_shares": 25000,
+      "status": "vested",
+      "vest_conditions": "完成核心架构微服务化重构",
+      "vested_at": "2026-01-15T08:00:00.000Z"
+    },
+    {
+      "id": "cycle_3_2",
+      "plan_id": "plan_3",
+      "cycle_no": 2,
+      "vest_date": "2027-01-15",
+      "vest_percentage": 25,
+      "vest_shares": 25000,
+      "status": "pending",
+      "vest_conditions": "高并发系统SLA达到99.99%"
+    },
+    {
+      "id": "cycle_3_3",
+      "plan_id": "plan_3",
+      "cycle_no": 3,
+      "vest_date": "2028-01-15",
+      "vest_percentage": 25,
+      "vest_shares": 25000,
+      "status": "pending",
+      "vest_conditions": "技术专利或架构创新"
+    },
+    {
+      "id": "cycle_3_4",
+      "plan_id": "plan_3",
+      "cycle_no": 4,
+      "vest_date": "2029-01-15",
+      "vest_percentage": 25,
+      "vest_shares": 25000,
+      "status": "pending",
+      "vest_conditions": "服务满4年"
+    }
+  ],
+  "equity_records": [
+    {
+      "id": "rec_1",
+      "record_no": "EXE-2025-001",
+      "plan_id": "plan_1",
+      "plan_no": "OPT-2024-001",
+      "cycle_id": "cycle_1_1",
+      "cycle_no": 1,
+      "employee_id": "emp_1",
+      "employee_name": "张华",
+      "department_name": "核心研发中心",
+      "vest_date": "2025-01-01",
+      "shares": 75000,
+      "exercise_price": 2,
+      "total_amount": 150000,
+      "status": "exercised",
+      "created_at": "2025-01-05T10:00:00.000Z"
+    },
+    {
+      "id": "rec_2",
+      "record_no": "EXE-2025-002",
+      "plan_id": "plan_2",
+      "plan_no": "OPT-2024-002",
+      "cycle_id": "cycle_2_1",
+      "cycle_no": 1,
+      "employee_id": "emp_2",
+      "employee_name": "李晨",
+      "department_name": "产品与交互设计部",
+      "vest_date": "2025-03-01",
+      "shares": 50000,
+      "exercise_price": 2,
+      "total_amount": 100000,
+      "status": "exercised",
+      "created_at": "2025-03-05T10:00:00.000Z"
+    },
+    {
+      "id": "rec_3",
+      "record_no": "EXE-2026-001",
+      "plan_id": "plan_1",
+      "plan_no": "OPT-2024-001",
+      "cycle_id": "cycle_1_2",
+      "cycle_no": 2,
+      "employee_id": "emp_1",
+      "employee_name": "张华",
+      "department_name": "核心研发中心",
+      "vest_date": "2026-01-01",
+      "shares": 75000,
+      "exercise_price": 2,
+      "total_amount": 150000,
+      "status": "vested",
+      "created_at": "2026-01-01T08:00:00.000Z"
+    },
+    {
+      "id": "rec_4",
+      "record_no": "EXE-2026-002",
+      "plan_id": "plan_3",
+      "plan_no": "OPT-2025-001",
+      "cycle_id": "cycle_3_1",
+      "cycle_no": 1,
+      "employee_id": "emp_3",
+      "employee_name": "赵宇",
+      "department_name": "核心研发中心",
+      "vest_date": "2026-01-15",
+      "shares": 25000,
+      "exercise_price": 3.5,
+      "total_amount": 87500,
+      "status": "vested",
+      "created_at": "2026-01-15T08:00:00.000Z"
+    }
+  ],
+  "plan_execution_logs": [
+    {
+      "id": "exec_log_1",
+      "plan_id": "plan_1",
+      "employee_id": "emp_1",
+      "event_type": "vesting_completed",
+      "details": "第1期期权成熟成功，成熟75,000股",
+      "operator": "系统自动结算",
+      "created_at": "2025-01-01T08:00:00.000Z"
+    }
+  ],
+  "cron_execution_logs": [
+    {
+      "id": "cron_1",
+      "task_name": "定时期权成熟自动结算",
+      "status": "success",
+      "checked_count": 12,
+      "vested_count": 1,
+      "message": "巡检发现1项计划到达归属成熟日，已完成自动划转",
+      "executed_at": "2026-09-12T02:48:45.243Z"
+    }
+  ]
+}
