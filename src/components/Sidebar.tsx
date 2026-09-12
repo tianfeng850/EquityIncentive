@@ -12,6 +12,7 @@ import {
   Sparkles,
   ChevronRight,
   TrendingUp,
+  History,
   X
 } from 'lucide-react';
 import { CompanyShare } from '../types.js';
