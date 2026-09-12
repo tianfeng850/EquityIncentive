@@ -70,14 +70,3 @@ npm start
 ```
 
 ---
-
-## 📦 推送到 GitHub 仓库
-
-本项目已初始化 Git 仓库，并关联远程目标：
-`https://github.com/tianfeng850/EquityIncentive.git` (分支: `main`)
-
-在具备 GitHub 访问权限的环境中推送代码：
-```bash
-git push -u origin main
-```
-*提示：如需使用 Personal Access Token (PAT) 认证，可通过 `https://<TOKEN>@github.com/tianfeng850/EquityIncentive.git` 推送，或通过 AI Studio 界面右上角的「Export to GitHub」一键导出。*
