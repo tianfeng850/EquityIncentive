@@ -6,6 +6,7 @@ import {
   Building2,
   ScrollText,
   FileSpreadsheet,
+  History,
   Activity,
   ShieldCheck,
   AlertTriangle,
@@ -32,13 +33,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onRefreshHealth
 }) => {
   const navItems = [
-    { id: 'dashboard', label: '大盘总览', icon: LayoutDashboard },
     { id: 'shares', label: '股份管理', icon: Coins, highlight: true },
-    { id: 'employees', label: '员工档案', icon: Users },
-    { id: 'departments', label: '组织架构', icon: Building2 },
+    { id: 'employees', label: '员工管理', icon: Users },
+    { id: 'departments', label: '部门管理', icon: Building2 },
+    { id: 'reports', label: '员工股权报表', icon: FileSpreadsheet },
     { id: 'plans', label: '授予计划', icon: ScrollText },
-    { id: 'reports', label: '行权报表', icon: FileSpreadsheet },
-    { id: 'diagnostic', label: '连接诊断', icon: Activity }
+    { id: 'logs', label: '履约日志', icon: History }
   ];
 
   return (

@@ -7,6 +7,7 @@ import { EmployeesView } from './components/EmployeesView.js';
 import { DepartmentsView } from './components/DepartmentsView.js';
 import { PlansView } from './components/PlansView.js';
 import { ReportsView } from './components/ReportsView.js';
+import { FulfillmentLogsView } from './components/FulfillmentLogsView.js';
 import { DiagnosticView } from './components/DiagnosticView.js';
 import { DiagnosticModal } from './components/DiagnosticModal.js';
 import { api } from './services/api.js';
@@ -86,12 +87,13 @@ export default function App() {
   };
 
   const pageTitles: Record<string, { title: string; subtitle: string }> = {
+    shares: { title: '股份管理', subtitle: '维护公司注册资本、总估值、总股本及期权激励池基准配额' },
+    employees: { title: '员工管理', subtitle: '管理核心骨干身份档案、部门归属与累计期权成熟档案' },
+    departments: { title: '部门管理', subtitle: '维护组织架构单元、编制负责人及部门期权配额分布' },
+    reports: { title: '员工股权报表', subtitle: '全景统计各部门员工获授总量、已成熟归属与未成熟锁定报表' },
+    plans: { title: '授予计划', subtitle: '制定个性化期权授予协议、分期成熟时间表与归属履约条件' },
+    logs: { title: '履约日志', subtitle: '期权分期成熟归属、认购行权交割流水与基准变更审计台账' },
     dashboard: { title: '数据大盘总览', subtitle: '全景展示企业股权池水库、部门配额及在职成熟度' },
-    shares: { title: '公司股份与估值基准', subtitle: '维护每轮次/年度公司总估值、总股本及期权池配额' },
-    employees: { title: '员工激励档案库', subtitle: '管理核心骨干身份、所属部门与累计行权成熟档案' },
-    departments: { title: '组织架构与部门管理', subtitle: '维护内部组织单元、编制负责人及部门期权配额分布' },
-    plans: { title: '期权授予计划与成熟', subtitle: '制定个性化期权授予方案、分期成熟时间表与交割' },
-    reports: { title: '期权行权台账报表', subtitle: '多维度行权记录明细、财务结算单据及导出审计表' },
     diagnostic: { title: '系统连接与健康诊断', subtitle: '全链路数据库、网络路由、配额算法与系统环境综合巡检' }
   };
 
@@ -226,12 +228,21 @@ export default function App() {
                 onDataChanged={checkConnection}
                 initialEmployeeId={planInitialEmp}
                 initialYear={planInitialYear}
-                onNavigateToReports={() => setActiveTab('reports')}
+                onNavigateToReports={() => setActiveTab('logs')}
               />
             )}
 
             {activeTab === 'reports' && (
-              <ReportsView />
+              <ReportsView
+                onNavigateToLogs={() => setActiveTab('logs')}
+              />
+            )}
+
+            {activeTab === 'logs' && (
+              <FulfillmentLogsView
+                onNavigateToReports={() => setActiveTab('reports')}
+                onNavigateToPlans={() => setActiveTab('plans')}
+              />
             )}
 
             {activeTab === 'diagnostic' && (

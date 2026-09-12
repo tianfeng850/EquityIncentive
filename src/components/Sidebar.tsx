@@ -41,17 +41,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   setMobileOpen
 }) => {
-  const coreNavItems = [
-    { id: 'dashboard', label: '大盘总览', icon: LayoutDashboard, badge: '概览' },
-    { id: 'shares', label: '股份与估值', icon: Coins, badge: '基准', highlight: true },
-    { id: 'employees', label: '员工档案', icon: Users },
-    { id: 'departments', label: '组织架构', icon: Building2 },
-    { id: 'plans', label: '授予计划', icon: ScrollText, badge: '分期' }
-  ];
-
-  const secondaryNavItems = [
-    { id: 'reports', label: '行权台账报表', icon: FileSpreadsheet },
-    { id: 'diagnostic', label: '链路健康诊断', icon: Activity, extra: `${connectionStatus.latency}ms` }
+  // 按照第一版调整：股份管理，员工管理，部门管理，员工股权报表，授予计划，履约日志
+  const primaryNavItems = [
+    { id: 'shares', label: '股份管理', icon: Coins, badge: '基准' },
+    { id: 'employees', label: '员工管理', icon: Users },
+    { id: 'departments', label: '部门管理', icon: Building2 },
+    { id: 'reports', label: '员工股权报表', icon: FileSpreadsheet },
+    { id: 'plans', label: '授予计划', icon: ScrollText, badge: '分期' },
+    { id: 'logs', label: '履约日志', icon: History, badge: '流水' }
   ];
 
   const handleNavClick = (tabId: string) => {
@@ -146,20 +143,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Section 1: 核心业务 */}
-          <div>
+          {/* Core Business Navigation (按照第一版调整) */}
+          <div className="space-y-1">
             <div className="px-3 mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-              核心业务治理
+              业务管理导航
             </div>
             <nav className="space-y-1">
-              {coreNavItems.map(item => {
+              {primaryNavItems.map(item => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       isActive
                         ? 'bg-blue-50 text-blue-700 font-bold shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -189,51 +186,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 );
               })}
             </nav>
-          </div>
 
-          {/* Section 2: 财务与风控 */}
-          <div>
-            <div className="px-3 mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
-              财务审计与风控
+            {/* Subtle Dashboard Entry */}
+            <div className="pt-3 border-t border-slate-100 mt-4">
+              <button
+                onClick={() => handleNavClick('dashboard')}
+                className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
+                  activeTab === 'dashboard'
+                    ? 'bg-blue-50 text-blue-700 font-bold shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-center space-x-2.5">
+                  <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                  <span>数据大盘总览</span>
+                </div>
+                <span className="text-[10px] text-slate-400">看板</span>
+              </button>
             </div>
-            <nav className="space-y-1">
-              {secondaryNavItems.map(item => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavClick(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'bg-blue-50 text-blue-700 font-bold shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <Icon
-                        className={`w-4 h-4 ${
-                          isActive ? 'text-blue-600' : 'text-slate-400'
-                        }`}
-                      />
-                      <span>{item.label}</span>
-                    </div>
-
-                    {item.extra && (
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                          connectionStatus.ok
-                            ? 'text-emerald-600 bg-emerald-50'
-                            : 'text-rose-600 bg-rose-50'
-                        }`}
-                      >
-                        {item.extra}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
           </div>
         </div>
 

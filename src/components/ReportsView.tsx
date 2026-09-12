@@ -12,7 +12,11 @@ import {
 import { api } from '../services/api.js';
 import { Employee, GrantPlan, EquityRecord, Department } from '../types.js';
 
-export const ReportsView: React.FC = () => {
+interface ReportsViewProps {
+  onNavigateToLogs?: () => void;
+}
+
+export const ReportsView: React.FC<ReportsViewProps> = ({ onNavigateToLogs }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [plans, setPlans] = useState<GrantPlan[]>([]);
   const [records, setRecords] = useState<EquityRecord[]>([]);
@@ -89,20 +93,36 @@ export const ReportsView: React.FC = () => {
             <FileSpreadsheet className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">股权激励报表与行权台账 (Equity Reports)</h1>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-slate-900">员工股权报表</h1>
+              <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full font-semibold border border-blue-200">
+                期权归属总表
+              </span>
+            </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              多维度员工期权成熟台账、部门配额聚合分析与财务标准 CSV 导出
+              全景统计各部门核心员工期权获授总量、已成熟归属、未成熟锁定分布与成熟率
             </p>
           </div>
         </div>
 
-        <button
-          onClick={exportToCSV}
-          className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center space-x-1.5 self-start sm:self-auto shadow-2xs"
-        >
-          <Download className="w-4 h-4 text-slate-600" />
-          <span>导出当前报表 (CSV)</span>
-        </button>
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+          {onNavigateToLogs && (
+            <button
+              onClick={onNavigateToLogs}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-colors flex items-center space-x-1.5 shadow-2xs"
+            >
+              <span>查看履约日志 →</span>
+            </button>
+          )}
+
+          <button
+            onClick={exportToCSV}
+            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center space-x-1.5 shadow-2xs"
+          >
+            <Download className="w-4 h-4 text-slate-600" />
+            <span>导出报表 (CSV)</span>
+          </button>
+        </div>
       </div>
 
       {/* Summary KPI Cards */}
