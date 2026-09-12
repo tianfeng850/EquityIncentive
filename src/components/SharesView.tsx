@@ -48,6 +48,7 @@ export const SharesView: React.FC<SharesViewProps> = ({
   // Form State
   const [form, setForm] = useState({
     year: new Date().getFullYear(),
+    registered_capital: 10000000, // 公司注册资本（元）
     valuation: 100000000, // 1亿元
     total_shares: 10000000, // 1000万股
     pool_shares: 1500000, // 150万股
@@ -57,7 +58,7 @@ export const SharesView: React.FC<SharesViewProps> = ({
     currency: 'CNY',
     status: 'active' as 'active' | 'draft' | 'archived',
     notes: '',
-    overwrite: false
+    overwrite: true
   });
 
   // Alert message
@@ -97,12 +98,14 @@ export const SharesView: React.FC<SharesViewProps> = ({
       nextYear += 1;
     }
 
+    const defaultRegisteredCapital = 10000000;
     const defaultTotal = 10000000;
     const defaultValuation = 100000000;
     const defaultPool = 1500000;
 
     setForm({
       year: nextYear,
+      registered_capital: defaultRegisteredCapital,
       valuation: defaultValuation,
       total_shares: defaultTotal,
       pool_shares: defaultPool,
@@ -112,7 +115,7 @@ export const SharesView: React.FC<SharesViewProps> = ({
       currency: 'CNY',
       status: 'active',
       notes: `${nextYear}年度公司股权激励池基准规划`,
-      overwrite: false
+      overwrite: true
     });
     setFeedback(null);
     setModalOpen(true);
@@ -124,6 +127,7 @@ export const SharesView: React.FC<SharesViewProps> = ({
     setEditingId(share.id);
     setForm({
       year: share.year,
+      registered_capital: share.registered_capital || share.total_shares || 10000000,
       valuation: share.valuation,
       total_shares: share.total_shares,
       pool_shares: share.pool_shares,
@@ -140,6 +144,23 @@ export const SharesView: React.FC<SharesViewProps> = ({
   };
 
   // Input changes with dual linkage
+  const handleRegisteredCapitalChange = (regCap: number) => {
+    setForm(prev => {
+      // If total_shares was synchronized with registered_capital, sync it
+      const shouldSyncTotal = prev.total_shares === prev.registered_capital || prev.total_shares === 10000000;
+      const newTotal = shouldSyncTotal && regCap > 0 ? regCap : prev.total_shares;
+      const newPrice = newTotal > 0 ? Number((prev.valuation / newTotal).toFixed(4)) : prev.share_price;
+      const newPool = Math.round(newTotal * (prev.pool_percentage / 100));
+      return {
+        ...prev,
+        registered_capital: regCap,
+        total_shares: newTotal,
+        pool_shares: newPool,
+        share_price: newPrice
+      };
+    });
+  };
+
   const handleValuationChange = (val: number) => {
     const newPrice = form.total_shares > 0 ? Number((val / form.total_shares).toFixed(4)) : 0;
     setForm(prev => ({
@@ -187,6 +208,11 @@ export const SharesView: React.FC<SharesViewProps> = ({
     // Front-end sanity checks
     if (!form.year || form.year < 1990 || form.year > 2100) {
       setFeedback({ type: 'error', text: '请填写合理的年份 (1990 - 2100)' });
+      setSubmitting(false);
+      return;
+    }
+    if (!form.registered_capital || form.registered_capital <= 0) {
+      setFeedback({ type: 'error', text: '公司注册资本必须为大于 0 的数值' });
       setSubmitting(false);
       return;
     }
@@ -345,10 +371,16 @@ export const SharesView: React.FC<SharesViewProps> = ({
                 </span>
                 <span className="text-sm text-slate-300">版本年度：{activeShare.year} 年</span>
               </div>
-              <h2 className="text-2xl font-bold mt-2 text-white">
-                {activeShare.currency} {(activeShare.valuation / 10000).toLocaleString()} 万元
-                <span className="text-sm font-normal text-slate-400 ml-2">总估值</span>
-              </h2>
+              <div className="flex flex-wrap items-baseline gap-x-4 mt-2">
+                <h2 className="text-2xl font-bold text-white">
+                  {activeShare.currency} {(activeShare.valuation / 10000).toLocaleString()} 万元
+                  <span className="text-xs font-normal text-slate-400 ml-1.5">总估值</span>
+                </h2>
+                <div className="text-sm font-semibold text-emerald-400 font-mono">
+                  ¥ {((activeShare.registered_capital || activeShare.total_shares || 10000000) / 10000).toLocaleString()} 万元
+                  <span className="text-xs font-normal text-slate-400 ml-1">注册资本</span>
+                </div>
+              </div>
             </div>
 
               <div className="flex items-center space-x-2">
@@ -469,27 +501,28 @@ export const SharesView: React.FC<SharesViewProps> = ({
             <table className="w-full text-left text-sm text-slate-600">
               <thead className="bg-slate-50 text-xs uppercase font-bold text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-3.5">年度版本</th>
-                  <th className="px-6 py-3.5">公司总估值</th>
-                  <th className="px-6 py-3.5">总股本</th>
-                  <th className="px-6 py-3.5">激励池总规模 (比例)</th>
-                  <th className="px-6 py-3.5">已授予 / 剩余可用</th>
-                  <th className="px-6 py-3.5">每股基准价</th>
-                  <th className="px-6 py-3.5">状态</th>
-                  <th className="px-6 py-3.5 text-right">操作</th>
+                  <th className="px-5 py-3.5">年度版本</th>
+                  <th className="px-5 py-3.5">注册资本</th>
+                  <th className="px-5 py-3.5">公司总估值</th>
+                  <th className="px-5 py-3.5">总股本</th>
+                  <th className="px-5 py-3.5">激励池总规模 (比例)</th>
+                  <th className="px-5 py-3.5">已授予 / 剩余可用</th>
+                  <th className="px-5 py-3.5">每股基准价</th>
+                  <th className="px-5 py-3.5">状态</th>
+                  <th className="px-5 py-3.5 text-right">操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {shares.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
+                    <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
                       暂无股份信息，请点击右上角【添加公司股份信息】创建
                     </td>
                   </tr>
                 ) : (
                   shares.map(share => (
                     <tr key={share.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-slate-900 flex items-center space-x-2">
+                      <td className="px-5 py-4 font-semibold text-slate-900 flex items-center space-x-2">
                         <span>{share.year} 年度</span>
                         {share.status === 'active' && (
                           <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-3xs px-1.5 py-0.5 rounded font-medium">
@@ -497,17 +530,20 @@ export const SharesView: React.FC<SharesViewProps> = ({
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 font-medium text-slate-900">
+                      <td className="px-5 py-4 font-mono font-medium text-emerald-700 whitespace-nowrap">
+                        ¥{((share.registered_capital || share.total_shares || 10000000) / 10000).toLocaleString()} 万
+                      </td>
+                      <td className="px-5 py-4 font-medium text-slate-900 whitespace-nowrap">
                         {share.currency} {(share.valuation / 10000).toLocaleString()} 万
                       </td>
-                      <td className="px-6 py-4">{Number(share.total_shares).toLocaleString()} 股</td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-4 whitespace-nowrap">{Number(share.total_shares).toLocaleString()} 股</td>
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <span className="font-semibold text-blue-600">
                           {Number(share.pool_shares).toLocaleString()} 股
                         </span>
                         <span className="text-xs text-slate-400 ml-1">({share.pool_percentage}%)</span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <div className="text-xs">
                           <span className="text-purple-600 font-medium">
                             {Number(share.granted_shares || 0).toLocaleString()}
@@ -518,10 +554,10 @@ export const SharesView: React.FC<SharesViewProps> = ({
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 font-mono font-medium text-slate-700">
+                      <td className="px-5 py-4 font-mono font-medium text-slate-700 whitespace-nowrap">
                         ¥ {Number(share.share_price).toFixed(2)}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-4 whitespace-nowrap">
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                             share.status === 'active'
@@ -694,6 +730,39 @@ export const SharesView: React.FC<SharesViewProps> = ({
                     <option value="draft">规划草案 (Draft)</option>
                     <option value="archived">归档历史 (Archived)</option>
                   </select>
+                </div>
+
+                {/* Company Registered Capital */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-slate-700">
+                      公司注册资本 (元) <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-3xs text-emerald-600 font-semibold">
+                      {(form.registered_capital / 10000).toLocaleString()} 万元
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1000"
+                    value={form.registered_capital}
+                    onChange={e => handleRegisteredCapitalChange(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm font-mono"
+                    required
+                  />
+                  <div className="flex space-x-1.5 mt-1.5">
+                    {[5000000, 10000000, 20000000, 50000000].map(c => (
+                      <button
+                        type="button"
+                        key={c}
+                        onClick={() => handleRegisteredCapitalChange(c)}
+                        className="px-2 py-0.5 text-3xs rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                      >
+                        {c / 10000}万
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Company Valuation */}
@@ -891,6 +960,18 @@ export const SharesView: React.FC<SharesViewProps> = ({
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-slate-600">
                   <div>
+                    · 公司注册资本:{' '}
+                    <span className="font-semibold text-emerald-700">
+                      ¥ {(form.registered_capital / 10000).toLocaleString()} 万元
+                    </span>
+                  </div>
+                  <div>
+                    · 公司总估值:{' '}
+                    <span className="font-semibold text-blue-700">
+                      ¥ {(form.valuation / 10000).toLocaleString()} 万元
+                    </span>
+                  </div>
+                  <div>
                     · 每股净资产/基准价:{' '}
                     <span className="font-semibold text-slate-900">
                       ¥ {Number(form.share_price).toFixed(2)}
@@ -907,7 +988,7 @@ export const SharesView: React.FC<SharesViewProps> = ({
                     </span>
                   </div>
                   <div>
-                    · 合法性检查:{' '}
+                    · 合规性检查:{' '}
                     <span className="font-semibold text-emerald-600">全部通过 ✓</span>
                   </div>
                 </div>

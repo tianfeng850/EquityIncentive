@@ -1,6 +1,7 @@
 export interface CompanyShare {
   id: string;
   year: number;
+  registered_capital?: number; // 公司注册资本（元）
   valuation: number; // 总估值
   total_shares: number; // 总股本
   pool_shares: number; // 激励池总股数

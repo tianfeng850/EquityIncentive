@@ -35,6 +35,7 @@ const defaultSeedData: DatabaseSchema = {
     {
       id: 'share_2025',
       year: 2025,
+      registered_capital: 10000000, // 注册资本1000万元
       valuation: 120000000, // 1.2亿元
       total_shares: 10000000, // 1000万股
       pool_shares: 1500000, // 150万股 (15%)
@@ -50,6 +51,7 @@ const defaultSeedData: DatabaseSchema = {
     {
       id: 'share_2024',
       year: 2024,
+      registered_capital: 10000000, // 注册资本1000万元
       valuation: 80000000, // 8000万元
       total_shares: 10000000,
       pool_shares: 1200000,
@@ -522,8 +524,13 @@ class EquityDatabase {
       const granted_shares = yearPlans.reduce((sum, p) => sum + (Number(p.total_shares) || 0), 0);
       const pool_shares = Number(share.pool_shares) || 0;
       const remaining_pool_shares = Math.max(0, pool_shares - granted_shares);
+      const registered_capital = share.registered_capital !== undefined && !isNaN(Number(share.registered_capital))
+        ? Number(share.registered_capital)
+        : (Number(share.total_shares) || 10000000);
+
       return {
         ...share,
+        registered_capital,
         granted_shares,
         remaining_pool_shares
       };
@@ -544,14 +551,18 @@ class EquityDatabase {
       return { success: false, error: '请输入合理的年份 (1990 ~ 2100)' };
     }
 
-    const valuation = Number(shareData.valuation);
-    if (isNaN(valuation) || valuation <= 0) {
-      return { success: false, error: '公司估值必须为大于0的数字' };
-    }
-
     const total_shares = Number(shareData.total_shares);
     if (isNaN(total_shares) || total_shares <= 0) {
       return { success: false, error: '公司总股本必须为大于0的整数' };
+    }
+
+    const registered_capital = shareData.registered_capital !== undefined && !isNaN(Number(shareData.registered_capital)) && Number(shareData.registered_capital) > 0
+      ? Number(shareData.registered_capital)
+      : total_shares;
+
+    const valuation = Number(shareData.valuation);
+    if (isNaN(valuation) || valuation <= 0) {
+      return { success: false, error: '公司估值必须为大于0的数字' };
     }
 
     let pool_shares = Number(shareData.pool_shares);
@@ -585,12 +596,6 @@ class EquityDatabase {
 
     // Check if year already exists
     const existingIndex = this.data.company_shares.findIndex(s => Number(s.year) === year);
-    if (existingIndex >= 0 && !shareData.overwrite) {
-      return {
-        success: false,
-        error: `年度 [${year}] 的公司股份信息已存在！如需更新已有年份记录，请直接在列表中点击【编辑】，或选择覆盖保存。`
-      };
-    }
 
     const now = new Date().toISOString();
     const newId = existingIndex >= 0 ? this.data.company_shares[existingIndex].id : `share_${year}_${Date.now()}`;
@@ -598,6 +603,7 @@ class EquityDatabase {
     const newRecord = {
       id: newId,
       year,
+      registered_capital,
       valuation,
       total_shares,
       pool_shares,
@@ -619,7 +625,7 @@ class EquityDatabase {
         share_id: newId,
         year,
         change_type: 'update',
-        details: `覆盖修改 ${year} 年度股份信息：估值 ${valuation} 元，激励池 ${pool_shares} 股 (${pool_percentage}%)`,
+        details: `更新 ${year} 年度股份基准配置：注册资本 ${registered_capital.toLocaleString()} 元，估值 ${valuation.toLocaleString()} 元，激励池 ${pool_shares.toLocaleString()} 股 (${pool_percentage}%)`,
         old_values: oldVal,
         new_values: newRecord,
         operator,
@@ -632,7 +638,7 @@ class EquityDatabase {
         share_id: newId,
         year,
         change_type: 'create',
-        details: `新增 ${year} 年度股份基准配置：估值 ${valuation} 元，激励池 ${pool_shares} 股 (${pool_percentage}%)，每股 ${share_price} 元`,
+        details: `新增 ${year} 年度股份基准配置：注册资本 ${registered_capital.toLocaleString()} 元，估值 ${valuation.toLocaleString()} 元，激励池 ${pool_shares.toLocaleString()} 股 (${pool_percentage}%)，每股 ${share_price} 元`,
         new_values: newRecord,
         operator,
         created_at: now
@@ -653,6 +659,9 @@ class EquityDatabase {
     const year = updateData.year !== undefined ? Number(updateData.year) : current.year;
     const valuation = updateData.valuation !== undefined ? Number(updateData.valuation) : current.valuation;
     const total_shares = updateData.total_shares !== undefined ? Number(updateData.total_shares) : current.total_shares;
+    const registered_capital = updateData.registered_capital !== undefined && !isNaN(Number(updateData.registered_capital))
+      ? Number(updateData.registered_capital)
+      : (current.registered_capital || total_shares || 10000000);
 
     let pool_shares = updateData.pool_shares !== undefined ? Number(updateData.pool_shares) : current.pool_shares;
     let pool_percentage = updateData.pool_percentage !== undefined ? Number(updateData.pool_percentage) : current.pool_percentage;
@@ -682,6 +691,7 @@ class EquityDatabase {
       ...current,
       ...updateData,
       year,
+      registered_capital,
       valuation,
       total_shares,
       pool_shares,
@@ -697,7 +707,7 @@ class EquityDatabase {
       share_id: id,
       year,
       change_type: 'update',
-      details: `更新 ${year} 年度股份配置信息`,
+      details: `更新 ${year} 年度股份配置信息：注册资本 ${registered_capital.toLocaleString()} 元，估值 ${valuation.toLocaleString()} 元`,
       old_values: current,
       new_values: updated,
       operator,
