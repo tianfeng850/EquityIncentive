@@ -11,21 +11,30 @@ import {
   Mail,
   Phone,
   Calendar,
-  Award
+  Award,
+  ScrollText
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import { Employee, Department } from '../types.js';
+import { ConfirmModal } from './ConfirmModal.js';
 
 interface EmployeesViewProps {
   onDataChanged?: () => void;
+  onNavigateToPlans?: (employeeId: string) => void;
+  initialDepartmentFilter?: string | null;
 }
 
-export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) => {
+export const EmployeesView: React.FC<EmployeesViewProps> = ({
+  onDataChanged,
+  onNavigateToPlans,
+  initialDepartmentFilter
+}) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDept, setSelectedDept] = useState<string>('all');
+  const [selectedDept, setSelectedDept] = useState<string>(initialDepartmentFilter || 'all');
+  const [confirmEmp, setConfirmEmp] = useState<Employee | null>(null);
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -64,6 +73,12 @@ export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) =
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (initialDepartmentFilter) {
+      setSelectedDept(initialDepartmentFilter);
+    }
+  }, [initialDepartmentFilter]);
 
   const handleOpenAdd = () => {
     setIsEditing(false);
@@ -139,13 +154,16 @@ export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) =
     }
   };
 
-  const handleDelete = async (emp: Employee) => {
-    if (!window.confirm(`确定要注销员工 [${emp.name}] 的档案吗？`)) return;
+  const handleDelete = (emp: Employee) => {
+    setConfirmEmp(emp);
+  };
 
+  const confirmDeleteEmp = async () => {
+    if (!confirmEmp) return;
     try {
-      const res = await api.deleteEmployee(emp.id);
+      const res = await api.deleteEmployee(confirmEmp.id);
       if (res.success) {
-        setFeedback({ type: 'success', text: `员工 ${emp.name} 已成功注销` });
+        setFeedback({ type: 'success', text: `员工 ${confirmEmp.name} 已成功注销` });
         await fetchData();
         if (onDataChanged) onDataChanged();
       } else {
@@ -153,6 +171,8 @@ export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) =
       }
     } catch (err: any) {
       setFeedback({ type: 'error', text: `删除操作失败: ${err.message}` });
+    } finally {
+      setConfirmEmp(null);
     }
   };
 
@@ -320,17 +340,27 @@ export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) =
                           {emp.status === 'active' ? '在职' : '离职'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right space-x-1">
+                      <td className="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                        {onNavigateToPlans && (
+                          <button
+                            onClick={() => onNavigateToPlans(emp.id)}
+                            className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200/60"
+                            title="为此员工发起期权授予计划"
+                          >
+                            <ScrollText className="w-3.5 h-3.5" />
+                            <span>授予期权</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => handleOpenEdit(emp)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors inline-flex"
                           title="编辑档案"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(emp)}
-                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors inline-flex"
                           title="删除员工"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -344,6 +374,21 @@ export const EmployeesView: React.FC<EmployeesViewProps> = ({ onDataChanged }) =
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(confirmEmp)}
+        title="注销激励员工档案"
+        message={
+          confirmEmp
+            ? `确定要注销员工 [${confirmEmp.name}] (${confirmEmp.employee_no}) 的档案吗？如果该员工名下有进行中的期权计划，系统将提示保护。`
+            : ''
+        }
+        confirmText="确认注销"
+        confirmVariant="danger"
+        onConfirm={confirmDeleteEmp}
+        onCancel={() => setConfirmEmp(null)}
+      />
 
       {/* ADD/EDIT EMPLOYEE MODAL */}
       {modalOpen && (

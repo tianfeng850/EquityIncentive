@@ -15,21 +15,29 @@ import {
   ArrowRight,
   ShieldAlert,
   Sparkles,
-  Info
+  Info,
+  ScrollText
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import { CompanyShare, ShareChangeLog } from '../types.js';
+import { ConfirmModal } from './ConfirmModal.js';
 
 interface SharesViewProps {
   onDataChanged?: () => void;
   onOpenDiagnostic?: () => void;
+  onNavigateToPlans?: (year?: number) => void;
 }
 
-export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDiagnostic }) => {
+export const SharesView: React.FC<SharesViewProps> = ({
+  onDataChanged,
+  onOpenDiagnostic,
+  onNavigateToPlans
+}) => {
   const [shares, setShares] = useState<CompanyShare[]>([]);
   const [logs, setLogs] = useState<ShareChangeLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'list' | 'logs'>('list');
+  const [confirmShare, setConfirmShare] = useState<CompanyShare | null>(null);
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -239,15 +247,16 @@ export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDia
   };
 
   // Delete Share
-  const handleDelete = async (share: CompanyShare) => {
-    if (!window.confirm(`确定要删除 ${share.year} 年度的股份配置记录吗？此操作不可逆。`)) {
-      return;
-    }
+  const handleDelete = (share: CompanyShare) => {
+    setConfirmShare(share);
+  };
 
+  const confirmDeleteShare = async () => {
+    if (!confirmShare) return;
     try {
-      const res = await api.deleteShare(share.id);
+      const res = await api.deleteShare(confirmShare.id);
       if (res.success) {
-        setFeedback({ type: 'success', text: `已删除 ${share.year} 年度股份记录` });
+        setFeedback({ type: 'success', text: `已删除 ${confirmShare.year} 年度股份记录` });
         await fetchSharesData();
         if (onDataChanged) onDataChanged();
       } else {
@@ -255,6 +264,8 @@ export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDia
       }
     } catch (err: any) {
       setFeedback({ type: 'error', text: `删除操作失败: ${err.message}` });
+    } finally {
+      setConfirmShare(null);
     }
   };
 
@@ -340,21 +351,30 @@ export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDia
               </h2>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <div className="bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-right">
-                <div className="text-xs text-slate-400">每股估值基准单价</div>
-                <div className="text-lg font-bold text-emerald-400">
-                  ¥ {Number(activeShare.share_price).toFixed(2)} / 股
+              <div className="flex items-center space-x-2">
+                <div className="bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-right">
+                  <div className="text-xs text-slate-400">每股估值基准单价</div>
+                  <div className="text-lg font-bold text-emerald-400">
+                    ¥ {Number(activeShare.share_price).toFixed(2)} / 股
+                  </div>
                 </div>
+                {onNavigateToPlans && (
+                  <button
+                    onClick={() => onNavigateToPlans(activeShare.year)}
+                    className="px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white flex items-center space-x-1.5 shadow-sm shadow-blue-500/20 transition-all"
+                  >
+                    <ScrollText className="w-3.5 h-3.5" />
+                    <span>创建该年授予计划</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleOpenEdit(activeShare)}
+                  className="px-3 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-medium text-white flex items-center space-x-1.5 transition-colors"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>调整此基准</span>
+                </button>
               </div>
-              <button
-                onClick={() => handleOpenEdit(activeShare)}
-                className="px-3 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-medium text-white flex items-center space-x-1.5 transition-colors"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>调整此基准</span>
-              </button>
-            </div>
           </div>
 
           {/* Progress / Metric grid */}
@@ -514,17 +534,26 @@ export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDia
                           {share.status === 'active' ? '正式基准' : share.status === 'draft' ? '草案规划' : '历史归档'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right space-x-2">
+                      <td className="px-6 py-4 text-right space-x-1.5 whitespace-nowrap">
+                        {onNavigateToPlans && (
+                          <button
+                            onClick={() => onNavigateToPlans(share.year)}
+                            className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors inline-flex"
+                            title="以此基准创建授予计划"
+                          >
+                            <ScrollText className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleOpenEdit(share)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors inline-flex"
                           title="编辑股份信息"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(share)}
-                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors inline-flex"
                           title="删除股份记录"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -577,6 +606,21 @@ export const SharesView: React.FC<SharesViewProps> = ({ onDataChanged, onOpenDia
           </div>
         )}
       </div>
+
+      {/* Delete Share Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(confirmShare)}
+        title="确认删除公司股份配置"
+        message={
+          confirmShare
+            ? `确定要删除 ${confirmShare.year} 年度的股份配置吗？如果当前年度有关联的股权授予计划，系统将校验并拒绝删除以保证业务一致性。`
+            : ''
+        }
+        confirmText="确认删除"
+        confirmVariant="danger"
+        onConfirm={confirmDeleteShare}
+        onCancel={() => setConfirmShare(null)}
+      />
 
       {/* ADD / EDIT COMPANY SHARE MODAL */}
       {modalOpen && (

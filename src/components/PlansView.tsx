@@ -12,21 +12,38 @@ import {
   Zap,
   User,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import { GrantPlan, Employee, CompanyShare } from '../types.js';
+import { ConfirmModal } from './ConfirmModal.js';
 
 interface PlansViewProps {
   onDataChanged?: () => void;
+  onNavigateToReports?: () => void;
+  initialEmployeeId?: string | null;
+  initialYear?: number | null;
+  autoOpenAdd?: boolean;
 }
 
-export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
+export const PlansView: React.FC<PlansViewProps> = ({
+  onDataChanged,
+  onNavigateToReports,
+  initialEmployeeId,
+  initialYear,
+  autoOpenAdd
+}) => {
   const [plans, setPlans] = useState<GrantPlan[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [shares, setShares] = useState<CompanyShare[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
+  const [confirmVest, setConfirmVest] = useState<{
+    cycleId: string;
+    planNo: string;
+    cycleNo: number;
+  } | null>(null);
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,6 +86,21 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (autoOpenAdd || initialEmployeeId || initialYear) {
+      if (employees.length > 0 && shares.length > 0) {
+        const empId = initialEmployeeId || employees[0]?.id || '';
+        const yr = initialYear || shares.find(s => s.status === 'active')?.year || shares[0]?.year || 2025;
+        setForm(f => ({
+          ...f,
+          employee_id: empId,
+          share_year: yr
+        }));
+        setModalOpen(true);
+      }
+    }
+  }, [autoOpenAdd, initialEmployeeId, initialYear, employees, shares]);
 
   const handleOpenAdd = () => {
     const activeShare = shares.find(s => s.status === 'active') || shares[0];
@@ -114,15 +146,20 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
     }
   };
 
-  const handleVestImmediately = async (cycleId: string, planNo: string, cycleNo: number) => {
-    if (!window.confirm(`确认将计划 ${planNo} 的第 ${cycleNo} 期成熟并立即行权吗？`)) {
-      return;
-    }
+  const handleVestImmediately = (cycleId: string, planNo: string, cycleNo: number) => {
+    setConfirmVest({ cycleId, planNo, cycleNo });
+  };
 
+  const confirmVestAction = async () => {
+    if (!confirmVest) return;
+    const { cycleId, planNo, cycleNo } = confirmVest;
     try {
       const res = await api.vestCycle(cycleId);
       if (res.success) {
-        setFeedback({ type: 'success', text: `第 ${cycleNo} 期期权已成功手动成熟并记入行权总表！` });
+        setFeedback({
+          type: 'success',
+          text: `计划 [${planNo}] 第 ${cycleNo} 期期权已成功手动成熟并记入行权总表！`
+        });
         await fetchData();
         if (onDataChanged) onDataChanged();
       } else {
@@ -130,6 +167,8 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
       }
     } catch (err: any) {
       setFeedback({ type: 'error', text: `行权失败: ${err.message}` });
+    } finally {
+      setConfirmVest(null);
     }
   };
 
@@ -162,7 +201,7 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
 
       {feedback && (
         <div
-          className={`p-4 rounded-xl border flex items-center justify-between text-sm ${
+          className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm ${
             feedback.type === 'success'
               ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
               : 'bg-rose-50 border-rose-200 text-rose-800'
@@ -176,9 +215,24 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
             )}
             <span className="font-medium">{feedback.text}</span>
           </div>
-          <button onClick={() => setFeedback(null)} className="text-xs opacity-70 hover:opacity-100 underline">
-            关闭
-          </button>
+          <div className="flex items-center space-x-3 self-end sm:self-auto">
+            {feedback.type === 'success' && onNavigateToReports && (
+              <button
+                type="button"
+                onClick={onNavigateToReports}
+                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center space-x-1 shadow-xs"
+              >
+                <span>查看行权台账</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => setFeedback(null)}
+              className="text-xs opacity-70 hover:opacity-100 underline"
+            >
+              关闭
+            </button>
+          </div>
         </div>
       )}
 
@@ -336,6 +390,21 @@ export const PlansView: React.FC<PlansViewProps> = ({ onDataChanged }) => {
           })
         )}
       </div>
+
+      {/* Vesting Confirm Modal */}
+      <ConfirmModal
+        isOpen={Boolean(confirmVest)}
+        title="确认成熟并立即行权"
+        message={
+          confirmVest
+            ? `确认将计划 [${confirmVest.planNo}] 的第 ${confirmVest.cycleNo} 期成熟并立即交割行权吗？行权后将生成永久台账记录并同步更新员工已行权份额。`
+            : ''
+        }
+        confirmText="确认行权"
+        confirmVariant="primary"
+        onConfirm={confirmVestAction}
+        onCancel={() => setConfirmVest(null)}
+      />
 
       {/* CREATE NEW PLAN MODAL */}
       {modalOpen && (

@@ -7,21 +7,28 @@ import {
   Users,
   Coins,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import { Department } from '../types.js';
+import { ConfirmModal } from './ConfirmModal.js';
 
 interface DepartmentsViewProps {
   onDataChanged?: () => void;
+  onNavigateToEmployees?: (deptId: string) => void;
 }
 
-export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onDataChanged }) => {
+export const DepartmentsView: React.FC<DepartmentsViewProps> = ({
+  onDataChanged,
+  onNavigateToEmployees
+}) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmDept, setConfirmDept] = useState<Department | null>(null);
   const [form, setForm] = useState({
     name: '',
     code: '',
@@ -103,12 +110,16 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onDataChanged 
     }
   };
 
-  const handleDelete = async (dept: Department) => {
-    if (!window.confirm(`确定要删除部门 [${dept.name}] 吗？`)) return;
+  const handleDelete = (dept: Department) => {
+    setConfirmDept(dept);
+  };
+
+  const confirmDeleteDept = async () => {
+    if (!confirmDept) return;
     try {
-      const res = await api.deleteDepartment(dept.id);
+      const res = await api.deleteDepartment(confirmDept.id);
       if (res.success) {
-        setFeedback({ type: 'success', text: `部门 [${dept.name}] 已删除` });
+        setFeedback({ type: 'success', text: `部门 [${confirmDept.name}] 已删除` });
         await fetchDepts();
         if (onDataChanged) onDataChanged();
       } else {
@@ -116,6 +127,8 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onDataChanged 
       }
     } catch (e: any) {
       setFeedback({ type: 'error', text: e.message });
+    } finally {
+      setConfirmDept(null);
     }
   };
 
@@ -221,13 +234,39 @@ export const DepartmentsView: React.FC<DepartmentsViewProps> = ({ onDataChanged 
               </div>
             </div>
 
-            <div className="mt-4 pt-2 flex items-center justify-between text-3xs text-slate-400">
-              <span>架构ID: {dept.id}</span>
-              <span>状态: 正常运作</span>
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              {onNavigateToEmployees ? (
+                <button
+                  type="button"
+                  onClick={() => onNavigateToEmployees(dept.id)}
+                  className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                >
+                  <span>查看该部门员工 ({dept.employee_count || 0})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <span className="text-3xs text-slate-400">架构ID: {dept.id}</span>
+              )}
+              <span className="text-3xs text-slate-400">状态: 正常运作</span>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={Boolean(confirmDept)}
+        title="确认删除组织架构部门"
+        message={
+          confirmDept
+            ? `确定要删除部门 [${confirmDept.name}] 吗？如果该部门下存在关联员工或股权计划，系统将校验并提示保护。`
+            : ''
+        }
+        confirmText="确认删除"
+        confirmVariant="danger"
+        onConfirm={confirmDeleteDept}
+        onCancel={() => setConfirmDept(null)}
+      />
 
       {/* Modal */}
       {modalOpen && (
